@@ -2,6 +2,9 @@ pipeline {
     agent any
     environment {
         GIT_CREDENTIALS = 'github-https-creds' // Use the ID of your GitHub credentials in Jenkins
+        DOCKER_CREDENTIALS = 'dockerhub-credentials' // DockerHub credentials ID from Jenkins
+        DOCKER_IMAGE_NAME = 'yourdockerhubusername/calculator-app' // Change to your Docker Hub image name
+        DOCKER_TAG = 'latest' // You can customize this, for example based on branch or commit
     }
     stages {
         stage('Checkout Code') {
@@ -33,6 +36,26 @@ pipeline {
             }
         }
         
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image after tests pass
+                    sh 'docker build -t $DOCKER_IMAGE_NAME:$DOCKER_TAG .'
+                }
+            }
+        }
+        
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    // Log in to Docker Hub using Jenkins credentials
+                    withDockerRegistry(credentialsId: 'dockerhub-credentials') {
+                        sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG'
+                    }
+                }
+            }
+        }
+        
         stage('Push to Main') {
             when {
                 branch 'backend-dev' // You can customize this if needed, e.g., only on the 'backend-dev' branch
@@ -58,7 +81,7 @@ pipeline {
     }
     post {
         success {
-            echo 'Tests passed and changes pushed to main branch successfully!'
+            echo 'Tests passed, Docker image pushed to Docker Hub, and changes pushed to main branch successfully!'
         }
         failure {
             echo 'Tests failed. Please fix the issues.'
