@@ -6,16 +6,18 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                // Updated to HTTPS format and using the correct credentials ID
+                // Use HTTPS and the appropriate credentials for authentication
                 git branch: 'backend-dev', url: 'https://github.com/avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
             }
         }
         
         stage('Install Dependencies') {
             steps {
+                // Use bash explicitly to run the script
                 sh '''
+                    #!/bin/bash
                     python3 -m venv venv
-                    source venv/bin/activate
+                    . venv/bin/activate  # Use dot (.) instead of source
                     pip install -r requirements.txt
                 '''
             }
@@ -24,7 +26,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                    source venv/bin/activate
+                    #!/bin/bash
+                    . venv/bin/activate  # Use dot (.) instead of source
                     python manage.py test
                 '''
             }
