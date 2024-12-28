@@ -3,20 +3,20 @@ pipeline {
     environment {
         GIT_CREDENTIALS = 'github-https-creds' // Use the ID of your GitHub credentials in Jenkins
         DOCKER_CREDENTIALS = 'dockerhub-credentials' // DockerHub credentials ID from Jenkins
-        DOCKER_IMAGE_NAME = 'yourdockerhubusername/calculator-app' // Change to your Docker Hub image name
-        DOCKER_TAG = 'latest' // You can customize this, for example based on branch or commit
+        DOCKER_IMAGE_NAME = '7827303969/calculator-app' // Docker Hub image name, replace with your username
+        DOCKER_TAG = 'working' // Tag for the image
     }
     stages {
         stage('Checkout Code') {
             steps {
                 // Use HTTPS and the appropriate credentials for authentication
-                git branch: 'backend-dev', url: 'https://github.com/avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
+                git branch: 'main', url: 'https://github.com/avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
             }
         }
         
         stage('Install Dependencies') {
             steps {
-                // Use bash explicitly to run the script
+                // Install dependencies using bash explicitly
                 sh '''
                     #!/bin/bash
                     python3 -m venv venv
@@ -48,32 +48,9 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub using Jenkins credentials
+                    // Log in to Docker Hub using Jenkins credentials and push the image
                     withDockerRegistry(credentialsId: 'dockerhub-credentials') {
                         sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG'
-                    }
-                }
-            }
-        }
-        
-        stage('Push to Main') {
-            when {
-                branch 'backend-dev' // You can customize this if needed, e.g., only on the 'backend-dev' branch
-            }
-            steps {
-                script {
-                    // Only proceed if tests pass
-                    if (currentBuild.result == 'SUCCESS') {
-                        // Checkout the main branch
-                        sh 'git checkout main'
-                        
-                        // Merge the current branch into the main branch
-                        sh 'git merge backend-dev'
-                        
-                        // Push the changes to the main branch
-                        sh 'git push origin main'
-                    } else {
-                        error "Tests failed. Not merging to main."
                     }
                 }
             }
@@ -81,7 +58,7 @@ pipeline {
     }
     post {
         success {
-            echo 'Tests passed, Docker image pushed to Docker Hub, and changes pushed to main branch successfully!'
+            echo 'Tests passed, Docker image pushed to Docker Hub successfully!'
         }
         failure {
             echo 'Tests failed. Please fix the issues.'
