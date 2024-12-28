@@ -41,7 +41,7 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub-credentials') {
+                withDockerRegistry(credentialsId: 'dockerhub-credentials',url: 'https://index.docker.io/v1/') {
                     echo 'IN DOCKER PUSH'
                     sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG'
                     echo 'DOCKER PUSH ENDED'
