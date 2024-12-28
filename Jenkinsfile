@@ -8,18 +8,18 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
+                // Ensure using bash to enable 'source' command
                 sh '''
                     python3 -m venv venv
-                    source venv/bin/activate
-                    pip install -r requirements.txt
+                    bash -c "source venv/bin/activate && pip install -r requirements.txt"
                 '''
             }
         }
         stage('Run Tests') {
             steps {
+                // Run tests in the activated virtual environment
                 sh '''
-                    source venv/bin/activate
-                    python manage.py test
+                    bash -c "source venv/bin/activate && python manage.py test"
                 '''
             }
         }
