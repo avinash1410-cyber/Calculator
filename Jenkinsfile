@@ -1,67 +1,60 @@
 pipeline {
     agent any
     environment {
-        GIT_CREDENTIALS = 'github-https-creds' // Use the ID of your GitHub credentials in Jenkins
-        DOCKER_CREDENTIALS = 'dockerhub-credentials' // DockerHub credentials ID from Jenkins
-        DOCKER_IMAGE_NAME = '7827303969/calculator-app' // Docker Hub image name, replace with your username
-        DOCKER_TAG = 'working' // Tag for the image
+        GIT_CREDENTIALS = 'github-https-creds'
+        DOCKER_CREDENTIALS = 'dockerhub-credentials'
+        DOCKER_IMAGE_NAME = '7827303969/calculator-app'
+        DOCKER_TAG = "build-${env.BUILD_NUMBER}"
     }
     stages {
         stage('Checkout Code') {
             steps {
-                // Use HTTPS and the appropriate credentials for authentication
                 git branch: 'main', url: 'https://github.com/avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
             }
         }
-        
         stage('Install Dependencies') {
             steps {
-                // Install dependencies using bash explicitly
                 sh '''
                     #!/bin/bash
+                    apt-get update && apt-get install -y python3-venv
                     python3 -m venv venv
-                    . venv/bin/activate  # Use dot (.) instead of source
+                    . venv/bin/activate
                     pip install -r requirements.txt
                 '''
             }
         }
-        
         stage('Run Tests') {
             steps {
                 sh '''
                     #!/bin/bash
-                    . venv/bin/activate  # Use dot (.) instead of source
+                    . venv/bin/activate
                     python manage.py test
                 '''
             }
         }
-        
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Build the Docker image after tests pass
-                    sh 'docker build -t $DOCKER_IMAGE_NAME:$DOCKER_TAG .'
-                }
+                echo 'IN DOCKER BUILD'
+                sh 'docker build -t $DOCKER_IMAGE_NAME:$DOCKER_TAG .'
+                echo 'DOCKER BUILD ENDED'
             }
         }
-        
-        stage('Push Docker Image to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
-                script {
-                    // Log in to Docker Hub using Jenkins credentials and push the image
-                    withDockerRegistry(credentialsId: 'dockerhub-credentials') {
-                        sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG'
-                    }
+                withDockerRegistry(credentialsId: 'dockerhub-credentials') {
+                    echo 'IN DOCKER PUSH'
+                    sh 'docker push $DOCKER_IMAGE_NAME:$DOCKER_TAG'
+                    echo 'DOCKER PUSH ENDED'
                 }
             }
         }
     }
     post {
         success {
-            echo 'Tests passed, Docker image pushed to Docker Hub successfully!'
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo 'Tests failed. Please fix the issues.'
+            echo 'Pipeline failed. Check logs for details.'
         }
     }
 }
