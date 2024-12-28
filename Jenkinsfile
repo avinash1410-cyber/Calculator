@@ -1,12 +1,13 @@
 pipeline {
     agent any
     environment {
-        GIT_CREDENTIALS = 'github-https-creds' // Use the ID of your SSH key credential in Jenkins
+        GIT_CREDENTIALS = 'github-https-creds' // Use the ID of your GitHub credentials in Jenkins
     }
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'backend-dev', url: 'git@github.com:avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
+                // Updated to HTTPS format and using the correct credentials ID
+                git branch: 'backend-dev', url: 'https://github.com/avinash1410-cyber/Calculator.git', credentialsId: 'github-https-creds'
             }
         }
         
