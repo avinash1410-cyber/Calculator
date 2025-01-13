@@ -30,6 +30,7 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
-    -name: Build the Docker image
-     run:  |
-        docker build -t my-calc-django-app .
+
+    - name: Build Docker Image
+      run: |
+        docker build -t my-django-app .
