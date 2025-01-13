@@ -24,6 +24,9 @@ jobs:
         sudo apt-get install -y docker.io
         sudo usermod -aG docker $USER
         newgrp docker
+    - name: Restart Docker Service 
+      run: | 
+        sudo systemctl restart docker
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
