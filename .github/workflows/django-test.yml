@@ -46,4 +46,4 @@ jobs:
         docker build -t calc-back-image:latest .
     - name: Running the container of the image
       run: |
-        docker run --name The_calc_backend -it -p 8000:8000 calc-back-image:latest
+        docker run --name The_calc_backend -d -p 8000:8000 calc-back-image:latest
