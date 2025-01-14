@@ -9,9 +9,9 @@ def add(request):
         a = float(request.GET.get('a', 0))
         b = float(request.GET.get('b', 0))
         result = a + b
-        return JsonResponse({'operation': '         add', 'result': result})
+        return JsonResponse({'operation': 'add', 'result': result})
     except ValueError:
-        return JsonResponse({'error': 'Invalid input               for a or b'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'Invalid input for a or b'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
