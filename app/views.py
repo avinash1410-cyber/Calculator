@@ -11,7 +11,7 @@ def add(request):
         result = a + b
         return JsonResponse({'operation': 'add', 'result': result})
     except ValueError:
-        return JsonResponse({'error': 'Invalid input  for a or b'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': 'Invalid input for a or b'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
