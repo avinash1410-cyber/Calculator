@@ -44,3 +44,6 @@ jobs:
     - name: Build Docker Image
       run: |
         docker build -t calc-back-image:latest .
+    - name: Build Docker Container
+      run: |
+        docker run --name calc-back -d -p 8000:8000 calc-back-image:latest
