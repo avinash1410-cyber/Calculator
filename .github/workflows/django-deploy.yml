@@ -1,0 +1,51 @@
+name: Django CI/CD second pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the workflow'
+        required: false
+        default: 'main'
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install Docker
+      run: | 
+        sudo apt-get update 
+        sudo apt-get install -y docker.io
+        sudo usermod -aG docker $USER
+        newgrp docker
+        sudo chown $USER:docker /var/run/docker.sock
+    - name: Restart Docker Service 
+      run: | 
+        sudo systemctl restart docker
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Tests
+      run: |
+        python manage.py test
+
+    - name: Build Docker Image
+      run: |
+        docker build -t calc-back-image:latest .
+    - name: Build Docker Container
+      run: |
+        docker run --name calc-back -d -p 8000:8000 calc-back-image:latest
