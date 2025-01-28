@@ -5,11 +5,8 @@ on:
     inputs:
       branch:
         description: 'Branch to run the workflow'
-        required: true
-        default: 'main'
-      directory:
-        description: 'Directory to run the workflow'
         required: false
+        default: 'main'
 
 jobs:
   test:
